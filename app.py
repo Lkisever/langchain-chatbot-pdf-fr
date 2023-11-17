@@ -7,10 +7,8 @@ from langchain.vectorstores import FAISS
 from langchain.memory import ConversationBufferMemory
 from langchain.chains import ConversationalRetrievalChain
 from langchain.llms import OpenAI
-from langchain.prompts import ChatPromptTemplate, SystemMessagePromptTemplate, HumanMessagePromptTemplate
+from langchain.prompts import PromptTemplate
 from htmlTemplates import bot_template, user_template, css
-
-from transformers import pipeline
 
 def get_pdf_text(pdf_files):
     
@@ -52,7 +50,7 @@ def get_conversation_chain(vector_store):
     )
 
      # Define the system message template
-    system_template = """Tu es un expert juridique qui assiste des magistrats.
+    prompt_template = """Tu es un expert juridique qui assiste des magistrats.
     Si tu ne connais pas la réponse tu réponds que tu ne sais pas.
     
     CONTEXT:
@@ -65,10 +63,7 @@ def get_conversation_chain(vector_store):
     """
 
     # Create the chat prompt templates
-    messages = [
-    SystemMessagePromptTemplate.from_template(system_template)
-    ]
-    qa_prompt = ChatPromptTemplate.from_messages(messages)
+    qa_prompt = PromptTemplate(template=prompt_template, input_variables=["context", "question"])
 
     memory = ConversationBufferMemory(memory_key='chat_history', return_messages=True)
 
